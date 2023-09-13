@@ -16,7 +16,10 @@ const scanDirectory = async (dirPath: string): Promise<unknown[]> =>
     await readdir(dirPath, { withFileTypes: true })
       .then((entries) =>
         entries.map((entry) => {
-          if (imageExt.includes(extname(entry.name)) || entry.isDirectory()) {
+          if (
+            imageExt.includes(extname(entry.name).toLocaleLowerCase()) ||
+            entry.isDirectory()
+          ) {
             const childPath = join(dirPath, entry.name)
             return entry.isDirectory() ? scanDirectory(childPath) : childPath
           }
