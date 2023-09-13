@@ -1,6 +1,7 @@
 migrated
 .git
 files/
+caches/
 node_modules
 .env*
 !.env

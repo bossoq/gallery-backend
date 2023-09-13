@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto'
-import { readdir } from 'node:fs/promises'
+import { readdir, writeFile } from 'node:fs/promises'
 import { basename, extname, join } from 'node:path'
 import { createFileEntry } from './prismaUtils'
 import exif from 'exif-reader'
 import sharp from 'sharp'
 import type { FilestoreEntry } from './prismaUtils.d'
 
+const caches = './caches'
 const directory = process.env.DIRECTORY ?? './files'
 const imageExt = ['.jpg', '.jpeg', '.png', '.webp', '.tiff', '.gif', '.svg']
 
@@ -27,7 +28,10 @@ const scanDirectory = async (dirPath: string): Promise<unknown[]> =>
 
 // get metadata for a file
 const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
+  console.log(`Processing ${filePath}`)
+  console.log(`Getting metadata for ${filePath}`)
   const fileMetadata = await sharp(`${filePath}`).metadata()
+  const fileId = randomUUID()
   const fileName = basename(filePath)
   const fileDir = filePath
     .replace(`/${fileName}`, '')
@@ -44,8 +48,16 @@ const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
       if (DateTimeOriginal) createdAt = DateTimeOriginal as Date
     }
   }
+  console.log(`Finished getting metadata for ${filePath}`)
+  const fileBuffer = await sharp(`${filePath}`)
+    .resize(200)
+    .jpeg({ mozjpeg: true })
+    .toBuffer()
+  console.log(`Writing thumbnail for ${filePath}`)
+  await writeFile(`${caches}/${fileId}.jpg`, fileBuffer)
+  console.log(`Finished writing thumbnail for ${filePath}`)
   const fileStore = {
-    fileId: randomUUID(),
+    fileId,
     fileName,
     fileDir,
     fileType: `image/${fileMetadata.format}`,
@@ -55,11 +67,13 @@ const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
     height: fileMetadata.height ?? 0,
     createdAt
   }
+  console.log(`Finished processing ${filePath}`)
   return fileStore
 }
 
 scanDirectory(directory).then((files) => {
-  files.flat(Infinity).forEach(async (file) => {
+  files.flat(Infinity).forEach(async (file, idx) => {
+    console.log(`Processing file ${idx + 1} of ${files.flat(Infinity).length}`)
     const metadata = await getFileMetadata(file as string)
     await createFileEntry(metadata)
   })

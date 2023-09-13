@@ -1,8 +1,9 @@
 import express from 'express'
-import fs from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import sharp from 'sharp'
 import { getAllFileEntries, getFileEntry } from './prismaUtils'
 
+const caches = './caches'
 const directory = process.env.DIRECTORY ?? './files'
 
 export const app = express()
@@ -22,7 +23,7 @@ app.get('/images/:id', async (req, res) => {
   const { fileName, fileDir, fileType, draft, deleted } = file
   if (draft || deleted) throw { status_code: 404, body: 'File not found' }
   let fileBuffer: Buffer
-  fileBuffer = await fs.readFile(`${directory}/${fileDir}/${fileName}`)
+  fileBuffer = await readFile(`${directory}/${fileDir}/${fileName}`)
   res.statusCode = 200
   res.setHeader('Content-Type', fileType)
   res.setHeader('Content-Length', fileBuffer.byteLength)
@@ -37,12 +38,17 @@ app.get('/images/:id/:type', async (req, res) => {
   if (draft || deleted) throw { status_code: 404, body: 'File not found' }
   let fileBuffer: Buffer
   if (type === 'thumbnail') {
-    fileBuffer = await sharp(`${directory}/${fileDir}/${fileName}`)
-      .resize(200)
-      .jpeg({ mozjpeg: true })
-      .toBuffer()
+    try {
+      fileBuffer = await readFile(`${caches}/${id}.jpg`)
+    } catch (e) {
+      fileBuffer = await sharp(`${directory}/${fileDir}/${fileName}`)
+        .resize(200)
+        .jpeg({ mozjpeg: true })
+        .toBuffer()
+      await writeFile(`${caches}/${id}.jpg`, fileBuffer)
+    }
   } else if (type === 'original') {
-    fileBuffer = await fs.readFile(`${directory}/${fileDir}/${fileName}`)
+    fileBuffer = await readFile(`${directory}/${fileDir}/${fileName}`)
   } else {
     throw { status_code: 404, body: 'File not found' }
   }
