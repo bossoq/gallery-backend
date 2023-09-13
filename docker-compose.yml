@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+        DATABASE_URL: ${DATABASE_URL}
+        HOST: ${HOST}
+        PORT: ${PORT}
+        DIRECTORY: ${DIRECTORY}
+    container_name: gallery-backend
+    restart: always
+    env_file:
+      - .env
+    networks:
+      br0:
+        ipv4_address: '10.0.3.88'
+
+networks:
+  br0:
+    external:
+      name: br0
