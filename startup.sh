@@ -7,7 +7,7 @@ if test -f "$FILE"; then
     yarn start
 else
     echo "Migrating..."
-    npx prisma migrate dev --name init
+    npx prisma migrate generate --schema=./prisma/schema.prisma
     yarn migrate
     echo "Migration complete"
     touch "$FILE"

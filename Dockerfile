@@ -20,7 +20,7 @@ RUN echo "deb http://ftp.debianclub.org/debian buster main" > /etc/apt/sources.l
 
 COPY package.json yarn.lock ./
 
-RUN yarn
+RUN yarn install --production=false
 
 COPY /src ./src
 COPY /prisma ./prisma
