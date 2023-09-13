@@ -18,7 +18,7 @@ RUN echo "deb http://ftp.debianclub.org/debian buster main" > /etc/apt/sources.l
     apt-get update && \
     apt-get install -y libtool-bin build-essential python3 openssl
 
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock tsconfig.json ./
 
 RUN yarn install --production=false
 
