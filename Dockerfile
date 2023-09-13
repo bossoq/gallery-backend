@@ -12,9 +12,13 @@ ENV HOST=${HOST}
 ARG PORT
 ENV PORT=${PORT}
 
+RUN apt-get update && apt-get install -y \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package.json yarn.lock ./
 
-RUN yarn install --production --frozen-lockfile --no-cache --prefer-offline
+RUN yarn install
 
 COPY /src ./src
 COPY /prisma ./prisma
