@@ -51,14 +51,6 @@ const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
       if (DateTimeOriginal) createdAt = DateTimeOriginal as Date
     }
   }
-  console.log(`Finished getting metadata for ${filePath}`)
-  const fileBuffer = await sharp(`${filePath}`)
-    .resize(200)
-    .jpeg({ mozjpeg: true })
-    .toBuffer()
-  console.log(`Writing thumbnail for ${filePath}`)
-  await writeFile(`${caches}/${fileId}.jpg`, fileBuffer)
-  console.log(`Finished writing thumbnail for ${filePath}`)
   const fileStore = {
     fileId,
     fileName,
@@ -70,8 +62,18 @@ const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
     height: fileMetadata.height ?? 0,
     createdAt
   }
-  console.log(`Finished processing ${filePath}`)
+  console.log(`Finished getting metadata for ${filePath}`)
   return fileStore
+}
+
+const createThumbnail = async (filePath: string, fileId: string) => {
+  const fileBuffer = await sharp(`${filePath}`)
+    .resize(200)
+    .jpeg({ mozjpeg: true })
+    .toBuffer()
+  console.log(`Writing thumbnail for ${filePath}`)
+  await writeFile(`${caches}/${fileId}.jpg`, fileBuffer)
+  console.log(`Finished writing thumbnail for ${filePath}`)
 }
 
 scanDirectory(directory).then((files) => {
@@ -79,10 +81,15 @@ scanDirectory(directory).then((files) => {
     console.log(`Processing file ${idx + 1} of ${files.flat(Infinity).length}`)
     getFileMetadata(file as string)
       .then((metadata) => {
-        createFileEntry(metadata)
-          .then(() => console.log(`Finished processing file ${idx + 1}`))
+        createThumbnail(file as string, metadata.fileId)
+          .then(() => {
+            createFileEntry(metadata)
+              .then(() => console.log(`Finished processing file ${idx + 1}`))
+              .catch((err) => console.error(err))
+          })
           .catch((err) => console.error(err))
       })
       .catch((err) => console.error(err))
+    console.log(`Finished processing ${file}`)
   }
 })
