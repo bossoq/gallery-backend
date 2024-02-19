@@ -10,6 +10,8 @@ config.json
 dist/
 prisma/migrations/*
 .env
+.yarn
+.yarnrc.yml
 
 .devspace/
 

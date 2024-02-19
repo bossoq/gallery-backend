@@ -4,3 +4,5 @@ node_modules/
 migrated
 dist/
 files/
+.yarn
+.yarnrc.yml
