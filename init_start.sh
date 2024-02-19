@@ -4,7 +4,6 @@ FILE=/app/caches/migrated
 
 if test -f "$FILE"; then
     echo "Already migrated"
-    yarn start
 else
     echo "Migrating..."
     npx prisma generate --schema=./prisma/schema.prisma
@@ -15,5 +14,4 @@ else
     yarn migrate
     echo "Migration complete"
     touch "$FILE"
-    yarn start
 fi
