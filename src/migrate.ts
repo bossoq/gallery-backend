@@ -75,9 +75,14 @@ const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
 }
 
 scanDirectory(directory).then((files) => {
-  files.flat(Infinity).forEach(async (file, idx) => {
+  for (const [idx, file] of files.flat(Infinity).entries()) {
     console.log(`Processing file ${idx + 1} of ${files.flat(Infinity).length}`)
-    const metadata = await getFileMetadata(file as string)
-    await createFileEntry(metadata)
-  })
+    getFileMetadata(file as string)
+      .then((metadata) => {
+        createFileEntry(metadata)
+          .then(() => console.log(`Finished processing file ${idx + 1}`))
+          .catch((err) => console.error(err))
+      })
+      .catch((err) => console.error(err))
+  }
 })
