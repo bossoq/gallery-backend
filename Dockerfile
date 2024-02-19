@@ -21,6 +21,7 @@ RUN echo "deb http://ftp.debianclub.org/debian buster main" > /etc/apt/sources.l
 COPY package.json yarn.lock tsconfig.json ./
 RUN mkdir -p /app/caches
 
+RUN yarn set version berry
 RUN yarn install --production=false
 
 COPY /src ./src
