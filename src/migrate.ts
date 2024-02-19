@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { readdir } from 'node:fs/promises'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { basename, extname, join } from 'node:path'
 import { createFileEntry } from './prismaUtils'
 import exif from 'exif-reader'
@@ -93,7 +93,8 @@ scanDirectory(directory)
           const fileDir = (file as string)
             .replace(`/${fileName}`, '')
             .replace(`${directory.replace('./', '')}/`, '')
-          sharp(`${file as string}`)
+          const fileBuff = readFileSync(file as string)
+          sharp(fileBuff)
             .toBuffer()
             .then((buffer) => buffer.byteLength)
             .catch((err) => console.error(err))
@@ -120,7 +121,7 @@ scanDirectory(directory)
               }
               console.debug(`Finished getting metadata for ${file}`)
               console.debug(`Writing thumbnail for ${file}`)
-              sharp(`${file as string}`)
+              sharp(fileBuff)
                 .resize(200)
                 .jpeg({ mozjpeg: true })
                 .toBuffer()
