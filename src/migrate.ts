@@ -31,8 +31,8 @@ const scanDirectory = async (dirPath: string): Promise<unknown[]> =>
 
 // get metadata for a file
 const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
-  console.log(`Processing ${filePath}`)
-  console.log(`Getting metadata for ${filePath}`)
+  console.debug(`Processing ${filePath}`)
+  console.debug(`Getting metadata for ${filePath}`)
   const fileMetadata = await sharp(`${filePath}`).metadata()
   const fileId = randomUUID()
   const fileName = basename(filePath)
@@ -62,7 +62,7 @@ const getFileMetadata = async (filePath: string): Promise<FilestoreEntry> => {
     height: fileMetadata.height ?? 0,
     createdAt
   }
-  console.log(`Finished getting metadata for ${filePath}`)
+  console.debug(`Finished getting metadata for ${filePath}`)
   return fileStore
 }
 
@@ -71,9 +71,9 @@ const createThumbnail = async (filePath: string, fileId: string) => {
     .resize(200)
     .jpeg({ mozjpeg: true })
     .toBuffer()
-  console.log(`Writing thumbnail for ${filePath}`)
+  console.debug(`Writing thumbnail for ${filePath}`)
   await writeFile(`${caches}/${fileId}.jpg`, fileBuffer)
-  console.log(`Finished writing thumbnail for ${filePath}`)
+  console.debug(`Finished writing thumbnail for ${filePath}`)
 }
 
 scanDirectory(directory).then((files) => {
