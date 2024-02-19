@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { readdir, writeFile } from 'node:fs/promises'
+import { readdir } from 'node:fs/promises'
+import { writeFileSync } from 'node:fs'
 import { basename, extname, join } from 'node:path'
 import { createFileEntry } from './prismaUtils'
 import exif from 'exif-reader'
@@ -124,11 +125,8 @@ scanDirectory(directory)
                 .jpeg({ mozjpeg: true })
                 .toBuffer()
                 .then((fileBuffer) => {
-                  writeFile(`${caches}/${fileId}.jpg`, fileBuffer)
-                    .then(() =>
-                      console.debug(`Finished writing thumbnail for ${file}`)
-                    )
-                    .catch((err) => console.error(err))
+                  writeFileSync(`${caches}/${fileId}.jpg`, fileBuffer)
+                  console.debug(`Finished writing thumbnail for ${file}`)
                 })
                 .catch((err) => console.error(err))
               console.debug(`Writing metadata for ${file}`)
