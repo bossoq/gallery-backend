@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE=migrated
+FILE=/app/cached/migrated
 
 if test -f "$FILE"; then
     echo "Already migrated"
