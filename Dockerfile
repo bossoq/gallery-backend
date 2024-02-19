@@ -22,7 +22,7 @@ COPY package.json yarn.lock tsconfig.json ./
 RUN mkdir -p /app/caches
 
 RUN yarn set version berry
-RUN yarn install --production=false
+RUN yarn install
 
 COPY /src ./src
 COPY /prisma ./prisma
