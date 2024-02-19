@@ -25,9 +25,9 @@ RUN yarn install --production=false
 
 COPY /src ./src
 COPY /prisma ./prisma
-COPY startup.sh ./
-RUN chmod +x startup.sh
+COPY init_start.sh app_start.sh ./
+RUN chmod +x init_start.sh app_start.sh
 
 EXPOSE ${PORT}
 
-CMD ["./startup.sh"]
+CMD ["./app_start.sh"]
