@@ -12,11 +12,12 @@ ENV HOST=${HOST}
 ARG PORT
 ENV PORT=${PORT}
 
-RUN echo "deb http://ftp.debianclub.org/debian buster main" > /etc/apt/sources.list && \
-    echo "deb http://ftp.debianclub.org/debian-security buster/updates main" >> /etc/apt/sources.list && \
-    echo "deb http://ftp.debianclub.org/debian buster-updates main" >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y libtool-bin build-essential python3 openssl
+# buster is EOL; its packages now live on archive.debian.org (Release files are
+# expired, hence Check-Valid-Until=false). Build deps are all in buster main.
+RUN printf 'deb http://archive.debian.org/debian buster main\n' > /etc/apt/sources.list && \
+    apt-get -o Acquire::Check-Valid-Until=false update && \
+    apt-get install -y --no-install-recommends libtool-bin build-essential python3 openssl && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY package.json yarn.lock tsconfig.json ./
 RUN mkdir -p /app/caches
