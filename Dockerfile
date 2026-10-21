@@ -14,7 +14,7 @@ ENV PORT=${PORT}
 
 # buster is EOL; its packages now live on archive.debian.org (Release files are
 # expired, hence Check-Valid-Until=false). Build deps are all in buster main.
-RUN printf 'deb http://archive.debian.org/debian buster main\n' > /etc/apt/sources.list && \
+RUN printf 'deb http://archive.debian.org/debian buster main\ndeb http://archive.debian.org/debian-security buster/updates main\ndeb http://archive.debian.org/debian buster-updates main\n' > /etc/apt/sources.list && \
     apt-get -o Acquire::Check-Valid-Until=false update && \
     apt-get install -y --no-install-recommends libtool-bin build-essential python3 openssl && \
     rm -rf /var/lib/apt/lists/*
